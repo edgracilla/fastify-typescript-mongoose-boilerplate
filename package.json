@@ -40,10 +40,13 @@
     "pm2": "^5.2.0"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.4",
     "@types/lodash": "^4.14.182",
+    "@types/supertest": "^2.0.12",
     "cross-env": "^7.0.3",
     "eslint": "^8.19.0",
     "jest": "^28.1.2",
+    "supertest": "^6.2.4",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4"
   }
