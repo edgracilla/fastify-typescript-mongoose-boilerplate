@@ -15,7 +15,21 @@
     "type": "git",
     "url": "git+https://github.com/edgracilla/fastify-typescript-mongoose-boilerplate.git"
   },
-  "keywords": [],
+  "keywords": [
+    "node",
+    "node.js",
+    "boilerplate",
+    "fastify",
+    "typescript",
+    "generator",
+    "rest",
+    "api",
+    "mongodb",
+    "mongoose",
+    "jest",
+    "docker",
+    "eslint"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
