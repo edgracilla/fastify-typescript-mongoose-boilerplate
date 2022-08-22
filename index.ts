@@ -73,6 +73,8 @@ app.register(cors, {
   }
 })
 
+app.decorate('controllers', {})
+
 // -- app loader
 
 app.after(async () => {
@@ -85,8 +87,19 @@ app.after(async () => {
   // app.addHook('preValidation', auth(modules, app.redis[NODE_ENV]))
 
   globby
+    .sync(`./src/modules/**/controller.ts`)
+    .map(async (ctlPath) => {
+      const ctlClass = await import(ctlPath.replace('.ts', ''))
+      const resource = path.basename(path.dirname(ctlPath))
+      const ctl = new ctlClass.default(app)
+
+      app.controllers[resource] = ctl
+    })
+
+  globby
     .sync(`./src/modules/**/routes.ts`)
     .map(route => app.register(import(route.replace('.ts', ''))))
+
 })
 
 // -- app init

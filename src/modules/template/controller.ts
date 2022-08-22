@@ -1,49 +1,34 @@
-import { FastifyInstance, FastifyRequest } from 'fastify'
+import { FastifyInstance } from 'fastify'
 
 import { TemplateModel } from '../models'
 import { BaseController } from '../../core'
-import { ITemplate, ITemplateModel, IValidationSchema, IMeta } from '../../declarations'
+import { ITemplate, ITemplateModel, IMeta, SearchQuery } from '../../declarations'
 
-interface ITemplateQuery {
-  name: string | string[]
-}
-
-export type TemplateRequest = FastifyRequest<{
-  Params: { _id: string }
-  Querystring: ITemplateQuery
-  Body: ITemplate
-  Meta: IMeta
-}>
-
-export const vSchema: IValidationSchema = {
-  body: {
-    type: 'object',
+const bodySchema = {
+  type: 'object',
     required: ['name', 'desc'],
     properties: {
       name: { type: 'string' },
       desc: { type: 'string' },
     }
-  },
-  querystring: {
-    _id: {
-      anyOf: [
-        { type: 'string', maxLength: 30 },
-        { type: 'array', items: { type: 'string', maxLength: 30 } }
-      ]
-    }
+}
+
+const querySchema = {
+  _id: {
+    anyOf: [
+      { type: 'string', maxLength: 30 },
+      { type: 'array', items: { type: 'string', maxLength: 30 } }
+    ]
   }
 }
 
 export default class TemplateController extends BaseController {
-  public resource: string
   private model: ITemplateModel
 
   constructor (fastify: FastifyInstance) {
-    super(vSchema)
-
+    super({ body: bodySchema, querystring: querySchema })
     this.model = TemplateModel
     this.model._init(fastify)
-    this.resource = TemplateModel.collection.name
   }
 
   /** create */
@@ -72,7 +57,7 @@ export default class TemplateController extends BaseController {
 
   /** search */
 
-  async search (options: ITemplateQuery) {
+  async search (options: SearchQuery) {
     const filter = this._mqs.parse(options)
     return await this.model._search(filter)
   }

@@ -1,49 +1,34 @@
-import { FastifyInstance, FastifyRequest } from 'fastify'
+import { FastifyInstance } from 'fastify'
 
 import { SampleModel } from '../models'
 import { BaseController } from '../../core'
-import { ISample, ISampleModel, IValidationSchema, IMeta } from '../../declarations'
+import { ISample, ISampleModel, IMeta, SearchQuery } from '../../declarations'
 
-interface ISampleQuery {
-  foo: string | string[]
+const bodySchema = {
+  type: 'object',
+  required: ['foo', 'bar'],
+  properties: {
+    foo: { type: 'string' },
+    bar: { type: 'string' },
+  }
 }
 
-export type SampleRequest = FastifyRequest<{
-  Params: { _id: string }
-  Querystring: ISampleQuery
-  Body: ISample
-  Meta: IMeta
-}>
-
-export const vSchema: IValidationSchema = {
-  body: {
-    type: 'object',
-    required: ['foo', 'bar'],
-    properties: {
-      foo: { type: 'string' },
-      bar: { type: 'string' },
-    }
-  },
-  querystring: {
-    _id: {
-      anyOf: [
-        { type: 'string', maxLength: 30 },
-        { type: 'array', items: { type: 'string', maxLength: 30 } }
-      ]
-    }
+const querySchema = {
+  _id: {
+    anyOf: [
+      { type: 'string', maxLength: 30 },
+      { type: 'array', items: { type: 'string', maxLength: 30 } }
+    ]
   }
 }
 
 export default class SampleController extends BaseController {
-  public resource: string
   private model: ISampleModel
 
   constructor (fastify: FastifyInstance) {
-    super(vSchema)
-
+    super({ body: bodySchema, querystring: querySchema })
     this.model = SampleModel
     this.model._init(fastify)
-    this.resource = SampleModel.collection.name
   }
 
   /** create */
@@ -72,7 +57,7 @@ export default class SampleController extends BaseController {
 
   /** search */
 
-  async search (options: ISampleQuery) {
+  async search (options: SearchQuery) {
     const filter = this._mqs.parse(options)
     return await this.model._search(filter)
   }

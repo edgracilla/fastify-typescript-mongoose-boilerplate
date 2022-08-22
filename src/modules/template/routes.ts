@@ -1,19 +1,17 @@
-import { pick } from 'lodash'
+import path from 'path'
+
 import { FastifyInstance } from 'fastify'
-import TemplateController, { vSchema, TemplateRequest } from './controller';
+import { AppRequest } from '../../declarations'
 
 const route = async (fastify: FastifyInstance) => {
-  const { apiResp, apiErr } = fastify
-  const ctl = new TemplateController(fastify)
+  const { apiResp, apiErr, controllers } = fastify
 
-  const { body, querystring } = vSchema
-  const postSchema = { schema: { body } }
-  const getSchema = { schema: { querystring } }
-  const patchSchema = { schema: { body: pick(body, ['type', 'properties']) } }
+  const resource = path.basename(__dirname)
+  const ctl = controllers[resource]
 
   /** create */
 
-  fastify.post(`/${ctl.resource}`, postSchema, async (request: TemplateRequest, reply) => {
+  fastify.post(`/${resource}`, ctl.postSchema, async (request: AppRequest, reply) => {
     const { body, meta } = request
 
     return ctl.create(body, meta)
@@ -23,17 +21,17 @@ const route = async (fastify: FastifyInstance) => {
 
   /** read */
 
-  fastify.get(`/${ctl.resource}/:_id`, async (request: TemplateRequest, reply) => {
-    const { params } = request
+  fastify.get(`/${resource}/:_id`, async (request: AppRequest, reply) => {
+    const { params, meta } = request
 
-    return ctl.read(params._id)
+    return ctl.read(params._id, meta)
       .then(ret => apiResp(reply, ret))
       .catch(err => apiErr(reply, err))
   })
 
   /** update */
 
-  fastify.patch(`/${ctl.resource}/:_id`, patchSchema, async (request: TemplateRequest, reply) => {
+  fastify.patch(`/${resource}/:_id`, ctl.patchSchema, async (request: AppRequest, reply) => {
     const { params, body, meta } = request
 
     return ctl.update(params._id, body, meta)
@@ -43,7 +41,7 @@ const route = async (fastify: FastifyInstance) => {
 
   /** delete */
 
-  fastify.delete(`/${ctl.resource}/:_id`, async (request: TemplateRequest, reply) => {
+  fastify.delete(`/${resource}/:_id`, async (request: AppRequest, reply) => {
     const { params, meta } = request
 
     return ctl.delete(params._id, meta)
@@ -53,7 +51,7 @@ const route = async (fastify: FastifyInstance) => {
 
   /** search */
 
-  fastify.get(`/${ctl.resource}`, getSchema, async (request: TemplateRequest, reply) => {
+  fastify.get(`/${resource}`, ctl.getSchema, async (request: AppRequest, reply) => {
     const { query, meta } = request
 
     return ctl.search(query)

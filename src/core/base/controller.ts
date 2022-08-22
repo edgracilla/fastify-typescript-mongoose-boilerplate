@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import MongoQS from 'mongo-querystring'
 
-import { get } from 'lodash'
+import { get, pick } from 'lodash'
+
 import { Errors } from '../../core'
 import { IValidationSchema } from '../../declarations'
 
@@ -9,8 +10,13 @@ class BaseController {
   public _mqs: MongoQS
   private prereqs: []
 
+  public getSchema: {}
+  public postSchema: {}
+  public patchSchema: {}
+
   constructor (vSchema: IValidationSchema) {
-    const queryableFields = Object.keys(vSchema.querystring)
+    const { body, querystring } = vSchema
+    const queryableFields = Object.keys(querystring)
 
     const whitelistParams = queryableFields
       .filter(Boolean)
@@ -32,7 +38,7 @@ class BaseController {
 
     // -- capture prerequisite fields
 
-    const props = vSchema.body.properties
+    const props = body.properties
     const fields = Object.keys(props || {})
 
     const ret = fields.map(field => {
@@ -44,6 +50,12 @@ class BaseController {
     })
 
     this.prereqs = ret.filter(Boolean) as []
+
+    // -- build verb specifig schema
+
+    this.postSchema = { schema: { body } }
+    this.getSchema = { schema: { querystring } }
+    this.patchSchema = { schema: { body: pick(body, ['type', 'properties']) } }
   }
 
   async prereqExists (body: object) {

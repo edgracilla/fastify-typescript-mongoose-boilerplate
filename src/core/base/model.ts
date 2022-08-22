@@ -6,7 +6,7 @@ import { cloneDeep, isEqual, get } from 'lodash'
 
 import serialize from 'fast-safe-stringify'
 
-import { ISearchOptions, IBaseModelCreateOption, AppDoc } from '../../declarations'
+import { ISearchParams, IBaseModelCreateOption, AppDoc } from '../../declarations'
 
 class BaseModel extends Model {
   static env: string
@@ -168,7 +168,7 @@ class BaseModel extends Model {
 
   /** search */
 
-  static async _search(filter: object, options: ISearchOptions = {}, hasNear: boolean = false) {
+  static async _search(filter: object, options: ISearchParams = {}, hasNear: boolean = false) {
     let { sort, page, limit } = options
 
     // TODO: cache ttl 10-15min use node-cache
