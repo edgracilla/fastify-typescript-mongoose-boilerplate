@@ -1,12 +1,12 @@
 import { FastifyInstance } from 'fastify'
+import { BaseController } from '../../../core'
+import { IMeta, SearchQuery } from '../../../declarations'
 
-import { SampleModel } from '../models'
-import { BaseController } from '../../core'
-import { ISample, ISampleModel, IMeta, SearchQuery } from '../../declarations'
+import SampleModel, { ISample, ISampleModel } from './model'
 
 const bodySchema = {
   type: 'object',
-  required: ['foo', 'bar'],
+  required: ['foo', 'bar', 'beer'],
   properties: {
     foo: { type: 'string' },
     bar: { type: 'string' },
@@ -59,6 +59,9 @@ export default class SampleController extends BaseController {
 
   async search (options: SearchQuery) {
     const filter = this._mqs.parse(options)
+
+    // TODO: handle search query
+
     return await this.model._search(filter)
   }
 }
