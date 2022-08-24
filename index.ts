@@ -2,18 +2,20 @@ import fastify from 'fastify'
 
 import path from 'path'
 import dotenv from 'dotenv'
-import globby from 'globby'
 
 import cors from '@fastify/cors'
 import fredis from '@fastify/redis'
 import helmet from '@fastify/helmet'
 import formbody from '@fastify/formbody'
 
-// import decl from './src/declarations'
 // import auth from './src/core/system/auth'
+
+import sysUtil from './src/core/system/utils'
 import dbService from './src/core/database/mongo'
 import apiReactor from './src/core/system/reactor'
 import mockRedis from './src/core/database/redis-mock'
+
+import { ModuleStructure } from './src/declarations'
 
 dotenv.config()
 
@@ -40,7 +42,7 @@ const loggerConfig = isInDev
 // -- initialize
 
 const app = fastify({
-  logger: loggerConfig,
+  logger: loggerConfig, // TODO: why stack trace included?
   ajv: ajvConfig,
 })
 
@@ -74,32 +76,34 @@ app.register(cors, {
 })
 
 app.decorate('controllers', {})
+app.decorate('api', {})
 
 // -- app loader
 
 app.after(async () => {
+  const versions = sysUtil.getDirs(`./src/modules/*`)
 
-  const modules = globby
-    .sync(`./src/modules/*/*`, { onlyDirectories: true })
-    .map(dir => path.basename(dir))
+  for (const version of versions) {
+    const modules = sysUtil.getDirs(`./src/modules/${version}/*`)
+    const routes = sysUtil.getFiles(`./src/modules/${version}/*/routes.ts`)
+    const ctlPaths = sysUtil.getFiles(`./src/modules/${version}/*/controller.ts`)
 
-  app.decorate('apiModules', modules)
-  // app.addHook('preValidation', auth(modules, app.redis[NODE_ENV]))
+    const  module: ModuleStructure = { modules, controllers: {} }
 
-  globby
-    .sync(`./src/modules/**/controller.ts`)
-    .map(async (ctlPath) => {
+    ctlPaths.map(async (ctlPath) => {
       const CtlClass = await import(ctlPath.replace('.ts', ''))
       const resource = path.basename(path.dirname(ctlPath))
       const controller = new CtlClass.default(app)
 
-      app.controllers[resource] = controller
+      module.controllers[resource] = controller
+      app.api[version] = module
     })
 
-  globby
-    .sync(`./src/modules/**/routes.ts`)
-    .map(route => app.register(import(route.replace('.ts', ''))))
-
+    routes.map(routePath => {
+      const route = import(routePath.replace('.ts', ''))
+      app.register(route, { prefix: `/${version}` })
+    })
+  }
 })
 
 // -- app init

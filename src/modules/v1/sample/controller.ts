@@ -1,15 +1,15 @@
 import { FastifyInstance } from 'fastify'
+import { BaseController } from '../../../core'
+import { IMeta, SearchQuery } from '../../../declarations'
 
-import { TemplateModel } from '../models'
-import { BaseController } from '../../core'
-import { ITemplate, ITemplateModel, IMeta, SearchQuery } from '../../declarations'
+import SampleModel, { ISample, ISampleModel } from './model'
 
 const bodySchema = {
   type: 'object',
-  required: ['name', 'desc'],
+  required: ['foo', 'bar'],
   properties: {
-    name: { type: 'string' },
-    desc: { type: 'string' },
+    foo: { type: 'string' },
+    bar: { type: 'string' },
   }
 }
 
@@ -22,18 +22,18 @@ const querySchema = {
   }
 }
 
-export default class TemplateController extends BaseController {
-  private model: ITemplateModel
+export default class SampleController extends BaseController {
+  private model: ISampleModel
 
   constructor (fastify: FastifyInstance) {
     super({ body: bodySchema, querystring: querySchema })
-    this.model = TemplateModel
+    this.model = SampleModel
     this.model._init(fastify)
   }
 
   /** create */
 
-  async create (data: ITemplate, meta: IMeta) {
+  async create (data: ISample, meta: IMeta) {
     return await this.model._create(data)
   }
 
@@ -45,7 +45,7 @@ export default class TemplateController extends BaseController {
 
   /** update */
 
-  async update (_id: string, data: ITemplate, meta: IMeta) {
+  async update (_id: string, data: ISample, meta: IMeta) {
     return await this.model._update({ _id }, data)
   }
 
@@ -59,6 +59,9 @@ export default class TemplateController extends BaseController {
 
   async search (options: SearchQuery) {
     const filter = this._mqs.parse(options)
+
+    // TODO: handle search query
+
     return await this.model._search(filter)
   }
 }

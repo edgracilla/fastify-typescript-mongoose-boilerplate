@@ -1,13 +1,12 @@
-import path from 'path'
-
 import { FastifyInstance } from 'fastify'
-import { AppRequest } from '../../declarations'
+import { AppRequest } from '../../../declarations'
+import { getPathInfo } from '../../../core/system/utils'
 
 const route = async (fastify: FastifyInstance) => {
-  const { apiResp, apiErr, controllers } = fastify
+  const { api, apiResp, apiErr } = fastify
+  const { resource, version } = getPathInfo(__dirname)
 
-  const resource = path.basename(__dirname)
-  const ctl = controllers[resource]
+  const ctl = api[version].controllers[resource]
 
   /** create */
 

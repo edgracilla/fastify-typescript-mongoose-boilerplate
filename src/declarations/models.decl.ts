@@ -77,6 +77,7 @@ export interface ISample {
   _id?: string
   foo: string
   bar: string
+  beer?: string
 }
 
 export interface ITemplate {

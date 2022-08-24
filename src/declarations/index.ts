@@ -15,6 +15,8 @@ declare module 'fastify' {
     redis: FastifyRedis
 
     controllers: { [key: string]: ControllerClasses },
+
+    api: { [version: string]: ModuleStructure },
   }
 
   interface FastifyRequest {
@@ -29,4 +31,9 @@ export interface IValidationSchema {
     properties?: object
   }
   querystring: object
+}
+
+export interface ModuleStructure {
+  modules: string[],
+  controllers: { [key: string]: ControllerClasses },
 }
