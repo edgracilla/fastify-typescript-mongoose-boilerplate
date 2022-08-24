@@ -6,11 +6,11 @@ import { ITemplate, ITemplateModel, IMeta, SearchQuery } from '../../declaration
 
 const bodySchema = {
   type: 'object',
-    required: ['name', 'desc'],
-    properties: {
-      name: { type: 'string' },
-      desc: { type: 'string' },
-    }
+  required: ['name', 'desc'],
+  properties: {
+    name: { type: 'string' },
+    desc: { type: 'string' },
+  }
 }
 
 const querySchema = {

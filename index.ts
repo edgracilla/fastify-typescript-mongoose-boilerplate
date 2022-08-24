@@ -89,11 +89,11 @@ app.after(async () => {
   globby
     .sync(`./src/modules/**/controller.ts`)
     .map(async (ctlPath) => {
-      const ctlClass = await import(ctlPath.replace('.ts', ''))
+      const CtlClass = await import(ctlPath.replace('.ts', ''))
       const resource = path.basename(path.dirname(ctlPath))
-      const ctl = new ctlClass.default(app)
+      const controller = new CtlClass.default(app)
 
-      app.controllers[resource] = ctl
+      app.controllers[resource] = controller
     })
 
   globby
@@ -142,14 +142,5 @@ SIGNALS.map(signal => {
 
   process.on(signal, sigFn[signal])
 })
-
-process.on('message', message => {
-  console.log('--', message)
-  if (message === 'shutdown') {
-    process.exit(0)
-  }
-});
-
-// TODO: bug on pm2 exit
 
 export default app
