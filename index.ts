@@ -64,17 +64,7 @@ app.register(redis, {
   url: process.env.REDIS_URL,
 })
 
-app.register(cors, {
-  origin: (origin, cb) => {
-    if(origin === void 0 || /localhost/.test(origin) || /\.tiedups\.com$/.test(origin)){
-      cb(null, true)
-      return
-    }
-
-    cb(new Error(`[CORS] Not allowed! ${origin}`), false)
-  }
-})
-
+app.register(cors, { origin: '*' }) // TODO: enhance cors once prod
 app.decorate('controllers', {})
 app.decorate('api', {})
 
