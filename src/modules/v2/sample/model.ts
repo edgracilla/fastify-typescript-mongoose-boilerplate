@@ -19,10 +19,6 @@ const schema = new Schema<ISample>({
     type: String,
     trim: true,
   },
-  beer: {
-    type: String,
-    trim: true,
-  },
 }, {
   minimize: false,
   timestamps: true,
