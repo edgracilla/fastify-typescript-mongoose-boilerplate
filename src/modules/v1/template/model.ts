@@ -1,16 +1,15 @@
-import { nanoid } from 'nanoid'
-import { BaseModel } from '../../../core'
-import { Schema, model, models } from 'mongoose'
+import BaseModel from '../../../core/base/model'
 
-import { getPathInfo } from '../../../core/system/utils'
+import { Schema, model, models } from 'mongoose'
 import { ITemplate, ITemplateModel } from '../../../declarations'
+import { getPathInfo, nanoidCustom } from '../../../core/system/utils'
 
 const { resource, modelName } = getPathInfo(__dirname)
 
 const schema = new Schema<ITemplate>({
   _id: {
     type: String,
-    default: () => nanoid()
+    default: () => nanoidCustom()
   },
   name: {
     type: String,

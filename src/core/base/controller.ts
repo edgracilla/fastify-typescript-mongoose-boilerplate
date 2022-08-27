@@ -3,7 +3,7 @@ import MongoQS from 'mongo-querystring'
 
 import { get, pick } from 'lodash'
 
-import { Errors } from '../../core'
+import { ValidationError } from '../../core/system/errors'
 import { IValidationSchema } from '../../declarations'
 
 class BaseController {
@@ -78,7 +78,7 @@ class BaseController {
     }
 
     if (errBag.length) {
-      throw new Errors.ValidationError('Missing prerequisite record.', errBag)
+      throw new ValidationError('Missing prerequisite record.', errBag)
     }
   }
 }

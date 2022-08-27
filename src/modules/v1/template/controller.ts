@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
-import { BaseController } from '../../../core'
 import { IMeta, SearchQuery } from '../../../declarations'
 
+import BaseController from '../../../core/base/controller'
 import TemplateModel, { ITemplate, ITemplateModel } from './model'
 
 const bodySchema = {

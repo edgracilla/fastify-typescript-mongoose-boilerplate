@@ -1,5 +1,12 @@
 import path from 'path'
 import globby from 'globby'
+import { customAlphabet } from 'nanoid'
+
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
+
+export const nanoidCustom = () => {
+  return customAlphabet(alphabet, 21)()
+}
 
 export const getDirs = (srcPath: string) => {
   return globby
@@ -20,6 +27,7 @@ export const getPathInfo = (_dirname: string) => {
 }
 
 export default {
+  nanoidCustom,
   getPathInfo,
   getFiles,
   getDirs
