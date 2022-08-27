@@ -11,6 +11,7 @@ declare module 'fastify' {
     apiErr (reply: FastifyReply, error: Error) : void
     apiResp (reply: FastifyReply, payload: unknown | null, code?: number) : void
 
+    config: AppConfig
     redis: FastifyRedis
     api: { [version: string]: ModuleStructure }
   }
@@ -18,6 +19,17 @@ declare module 'fastify' {
   interface FastifyRequest {
     meta: IMeta
   }
+}
+
+export interface AppConfig {
+  redis: {}
+  fastify: {}
+  mongodb: {}
+
+  env: string
+  port: number
+  root: string
+  cache: boolean
 }
 
 export interface ModuleStructure {

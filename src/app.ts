@@ -11,7 +11,7 @@ import dbService from './core/database/mongo'
 import apiReactor from './core/system/reactor'
 import mockRedis from './core/database/redis-mock'
 
-import { ModuleStructure } from './declarations'
+import { ModuleStructure, AppConfig } from './declarations'
 
 export default function app (config: any) {
   const redis = config.env === 'test' ? mockRedis : fredis
@@ -27,6 +27,7 @@ export default function app (config: any) {
   server.register(cors, { origin: '*' }) // !!
 
   server.decorate('api', {})
+  server.decorate('config', config)
 
   // -- app loader
 

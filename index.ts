@@ -8,6 +8,7 @@ dotenv.config()
 const root = __dirname
 const port = +(process.env.PORT || 8080)
 const env = process.env.NODE_ENV || 'development'
+const cache = process.env.CACHE === 'true'
 
 const logger = env === 'development'
   ? { transport: { target: 'pino-pretty', options: { translateTime: true } } }
@@ -35,7 +36,8 @@ const ajv = {
 
 const appConfig = {
   fastify: { logger, ajv },
-  mongodb, redis, env, port, root
+  mongodb, redis, env, port,
+  cache, root,
 }
 
 const server = app(appConfig)

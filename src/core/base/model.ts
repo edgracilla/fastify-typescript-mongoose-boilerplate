@@ -6,21 +6,24 @@ import { cloneDeep, isEqual, get } from 'lodash'
 
 import serialize from 'fast-safe-stringify'
 
-import { ISearchParams, IBaseModelCreateOption, AppDoc } from '../../declarations'
+import { AppDoc, ISearchParams, IBaseModelCreateOption } from '../../declarations'
 
 class BaseModel extends Model {
-  static env: string
   static redis: Redis
   static cache: boolean
   static resource: string
+  static namespace: string
 
   /** init */
 
   static _init(fastify: FastifyInstance) {
-    this.env = process.env.NODE_ENV || 'development'
-    this.cache = process.env.CACHE === 'true'
+    const config = fastify.config
+
+    this.cache = config.cache
+    this.namespace = config.env
+
     this.resource = this.collection.name
-    this.redis = fastify.redis[this.env]
+    this.redis = fastify.redis[this.namespace]
   }
 
   /** create */
@@ -206,7 +209,7 @@ class BaseModel extends Model {
   /** helper */
 
   private static _genKey (_id: string) {
-    return `${this.env}:${this.resource}:${_id}`
+    return `${this.namespace}:${this.resource}:${_id}`
   }
 }
 
