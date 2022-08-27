@@ -30,7 +30,8 @@ const redis = {
 
 const ajv = {
   customOptions: {
-    allErrors: true
+    allErrors: true,
+    keywords: ['prereq'],
   }
 }
 
