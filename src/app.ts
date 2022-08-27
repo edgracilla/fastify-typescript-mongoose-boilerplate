@@ -11,7 +11,7 @@ import dbService from './core/database/mongo'
 import apiReactor from './core/system/reactor'
 import mockRedis from './core/database/redis-mock'
 
-import { ModuleStructure, AppConfig } from './declarations'
+import { ModuleStructure } from './declarations'
 
 export default function app (config: any) {
   const redis = config.env === 'test' ? mockRedis : fredis
