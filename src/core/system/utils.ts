@@ -1,5 +1,6 @@
 import path from 'path'
 import globby from 'globby'
+import MongoQS from 'mongo-querystring'
 import { customAlphabet } from 'nanoid'
 
 const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
@@ -24,6 +25,26 @@ export const getPathInfo = (_dirname: string) => {
   const modelName = `${version}-${resource}`
 
   return { resource, version, modelName }
+}
+
+export const makeMongoQS = (params: string[]) => {
+  const whiteParams = params
+    .filter(Boolean)
+    .reduce((accum, key) => {
+      accum[key] = true
+      return accum
+    }, {} as Record<string, boolean>)
+
+  return new MongoQS({
+    whitelist: whiteParams,
+    blacklist: {
+      page: true,
+      sort: true,
+      limit: true,
+      near: true,
+      search: true,
+    }
+  })
 }
 
 export default {

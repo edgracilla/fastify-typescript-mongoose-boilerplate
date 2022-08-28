@@ -6,7 +6,7 @@ import { cloneDeep, isEqual, get } from 'lodash'
 
 import serialize from 'fast-safe-stringify'
 
-import { AppDoc, ISearchParams, IBaseModelCreateOption } from '../../declarations'
+import { ISearchParams, ICreateOption } from '../../declarations'
 
 class BaseModel extends Model {
   static redis: Redis
@@ -28,7 +28,7 @@ class BaseModel extends Model {
 
   /** create */
 
-  static async _create(data: AppDoc, options: IBaseModelCreateOption = { cache: true }) {
+  static async _create(data: object, options: ICreateOption = { cache: true }) {
     const cache = options.cache
     const model = new this()
 
@@ -81,7 +81,7 @@ class BaseModel extends Model {
 
   /** update */
 
-  static async _update(query: object, update: AppDoc, hard: boolean = false) {
+  static async _update(query: object, update: object, hard: boolean = false) {
     let doc = await this.findOne(query).exec()
     if (!doc) return null
 

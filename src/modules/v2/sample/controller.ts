@@ -1,67 +1,30 @@
-import { FastifyInstance } from 'fastify'
+import vld from './validation'
+
+import Model, { ISample } from './model'
+import { makeMongoQS } from '../../../core/system/utils'
 import { IMeta, SearchQuery } from '../../../declarations'
 
-import BaseController from '../../../core/base/controller'
-import SampleModel, { ISample, ISampleModel } from './model'
+const mqs = makeMongoQS(Object.keys(vld.query))
 
-const bodySchema = {
-  type: 'object',
-  required: ['foo', 'bar', 'beer'],
-  properties: {
-    foo: { type: 'string' },
-    bar: { type: 'string' },
-  }
+export async function create (data: ISample, meta: IMeta) {
+  return await Model._create(data)
 }
 
-const querySchema = {
-  _id: {
-    anyOf: [
-      { type: 'string', maxLength: 30 },
-      { type: 'array', items: { type: 'string', maxLength: 30 } }
-    ]
-  }
+export async function read (_id: string, meta: IMeta) {
+  return await Model._read(_id)
 }
 
-export default class SampleController extends BaseController {
-  private model: ISampleModel
-
-  constructor (fastify: FastifyInstance) {
-    super({ body: bodySchema, querystring: querySchema })
-    this.model = SampleModel
-    this.model._init(fastify)
-  }
-
-  /** create */
-
-  async create (data: ISample, meta: IMeta) {
-    return await this.model._create(data)
-  }
-
-  /** read */
-
-  async read (_id: string) {
-    return await this.model._read(_id)
-  }
-
-  /** update */
-
-  async update (_id: string, data: ISample, meta: IMeta) {
-    return await this.model._update({ _id }, data)
-  }
-
-  /** delete */
-
-  async delete (_id: string, meta: IMeta) {
-    return await this.model._delete(_id)
-  }
-
-  /** search */
-
-  async search (options: SearchQuery) {
-    const filter = this._mqs.parse(options)
-
-    // TODO: handle search query
-
-    return await this.model._search(filter)
-  }
+export async function update (_id: string, data: ISample, meta: IMeta) {
+  return await Model._update({ _id }, data)
 }
+
+export async function del (_id: string, meta: IMeta) {
+  return await Model._delete(_id)
+}
+
+export async function search (options: SearchQuery) {
+  const filter = mqs.parse(options)
+  return await Model._search(filter)
+}
+
+export default { create, read, update, del, search }

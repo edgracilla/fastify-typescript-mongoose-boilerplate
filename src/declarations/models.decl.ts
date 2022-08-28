@@ -31,5 +31,4 @@ export interface ITemplate {
 export interface ISampleModel extends Model<ISample>, IBaseModel<ISample> {}
 export interface ITemplateModel extends Model<ITemplate>, IBaseModel<ITemplate> {}
 
-export type AppDoc = ISample | ITemplate
 export type SearchQuery = ISampleQuery | ITemplateQuery

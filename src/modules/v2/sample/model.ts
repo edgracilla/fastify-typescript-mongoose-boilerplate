@@ -9,17 +9,13 @@ const { resource, modelName } = getPathInfo(__dirname)
 const schema = new Schema<ISample>({
   _id: {
     type: String,
-    default: () => nanoidCustom()
+    default: nanoidCustom()
   },
   foo: {
     type: String,
     trim: true,
   },
   bar: {
-    type: String,
-    trim: true,
-  },
-  beer: {
     type: String,
     trim: true,
   },

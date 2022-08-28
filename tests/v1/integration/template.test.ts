@@ -1,25 +1,25 @@
 import { agent } from 'supertest'
 import app from '../../../index'
 
-import SampleModel, { ISample } from '../../../src/modules/v2/sample/model'
+import TemplateModel, { ITemplate } from '../../../src/modules/v1/template/model'
 
 const api = agent(app.server)
 
-let _sample: ISample
+let _template: ITemplate
 
 const testData = {
-  foo: 'barv1',
-  bar: 'foov1'
+  name: 'barv1',
+  desc: 'foov1'
 }
 
-describe('/v2/sample', () => {
+describe('/v1/template', () => {
   beforeAll(async () => {
     await app.ready()
   })
 
   afterAll(async() => {
-    if (_sample && _sample._id) {
-      await SampleModel.deleteOne({ _id: _sample._id })
+    if (_template && _template._id) {
+      await TemplateModel.deleteOne({ _id: _template._id })
     }
 
     await app.close()
@@ -32,22 +32,22 @@ describe('/v2/sample', () => {
   describe('POST', () => {
     it('should catch required field validation', async () => {
       await api
-        .post('/v2/sample')
+        .post('/v1/template')
         .send({})
         .expect({
           statusCode: 400,
           error: 'Bad Request',
-          message: "body must have required property 'foo', body must have required property 'bar'"
+          message: "body must have required property 'name', body must have required property 'desc'"
         })
     })
 
     it('should create sample', async () => {
       const ret = await api
-        .post('/v2/sample')
+        .post('/v1/template')
         .send(testData)
         .expect(201)
 
-        _sample = ret.body
+        _template = ret.body
     })
   })
 
@@ -58,7 +58,7 @@ describe('/v2/sample', () => {
   describe('GET', () => {
     it('should catch non existing record', async () => {
       const ret = await api
-        .get('/v2/sample/non-existing-id')
+        .get('/v1/template/non-existing-id')
         .expect({
           statusCode: 404,
           error: 'Not found',
@@ -68,19 +68,19 @@ describe('/v2/sample', () => {
 
     it('should read correct record - by id', async () => {
       const ret = await api
-        .get(`/v2/sample/${_sample._id}`)
+        .get(`/v1/template/${_template._id}`)
         .expect(200)
 
-        expect(ret.body.foo).toBe(testData.foo)
+        expect(ret.body.name).toBe(testData.name)
     })
 
     it('should read correct record - query by name', async () => {
       const ret = await api
-        .get(`/v2/sample?search=${_sample.foo}`)
+        .get(`/v1/template?search=${_template.name}`)
         .expect(200)
 
         expect(ret.body.count).toBeGreaterThan(0)
-        expect(ret.body.records[0].foo).toBe(_sample.foo)
+        expect(ret.body.records[0].name).toBe(_template.name)
     })
   })
 
@@ -91,11 +91,11 @@ describe('/v2/sample', () => {
   describe('PATCH', () => {
     it('should update self', async () => {
       const ret = await api
-        .patch(`/v2/sample/${_sample._id}`)
-        .send({ foo: 'bars' })
+        .patch(`/v1/template/${_template._id}`)
+        .send({ name: 'bars' })
         .expect(200)
 
-        expect(ret.body.foo).toBe('bars')
+        expect(ret.body.name).toBe('bars')
     })
   })
 
@@ -106,7 +106,7 @@ describe('/v2/sample', () => {
   describe('DELETE', () => {
     it('should catch non existing record', async () => {
       await api
-        .delete('/v2/sample/non-existing-id')
+        .delete('/v1/template/non-existing-id')
         .expect({
           statusCode: 404,
           error: 'Not found',
@@ -116,11 +116,11 @@ describe('/v2/sample', () => {
 
     it('should delete record', async () => {
       const ret = await api
-        .delete(`/v2/sample/${_sample._id}`)
+        .delete(`/v1/template/${_template._id}`)
         .expect(204)
 
         if (ret.statusCode === 204) {
-          _sample = {} as ISample
+          _template = {} as ITemplate
         }
     })
   })

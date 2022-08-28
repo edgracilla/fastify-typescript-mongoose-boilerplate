@@ -1,19 +1,22 @@
-import { FastifyInstance } from 'fastify'
+import ctl from './controller'
+import vld from './validation'
+
+import { ITemplate } from './model'
 import { AppRequest } from '../../../declarations'
 import { getPathInfo } from '../../../core/system/utils'
 
-const route = async (fastify: FastifyInstance) => {
-  const { apiResp, apiErr, api } = fastify
-  const { resource, version } = getPathInfo(__dirname)
+import { FastifyInstance } from 'fastify'
 
-  const ctl = api[version].controllers[resource]
+async function routes (fastify: FastifyInstance) {
+  const { resource } = getPathInfo(__dirname)
+  const { apiResp, apiErr } = fastify
 
   /** create */
 
-  fastify.post(`/${resource}`, ctl.postSchema, async (request: AppRequest, reply) => {
+  fastify.post(`/${resource}`, vld.postSchema, async (request: AppRequest, reply) => {
     const { body, meta } = request
 
-    return ctl.create(body, meta)
+    return ctl.create(body as ITemplate, meta)
       .then(ret => apiResp(reply, ret, 201))
       .catch(err => apiErr(reply, err))
   })
@@ -30,10 +33,10 @@ const route = async (fastify: FastifyInstance) => {
 
   /** update */
 
-  fastify.patch(`/${resource}/:_id`, ctl.patchSchema, async (request: AppRequest, reply) => {
+  fastify.patch(`/${resource}/:_id`, vld.patchSchema, async (request: AppRequest, reply) => {
     const { params, body, meta } = request
 
-    return ctl.update(params._id, body, meta)
+    return ctl.update(params._id, body as ITemplate, meta)
       .then(ret => apiResp(reply, ret))
       .catch(err => apiErr(reply, err))
   })
@@ -43,14 +46,14 @@ const route = async (fastify: FastifyInstance) => {
   fastify.delete(`/${resource}/:_id`, async (request: AppRequest, reply) => {
     const { params, meta } = request
 
-    return ctl.delete(params._id, meta)
+    return ctl.del(params._id, meta)
       .then(ret => apiResp(reply, ret, 204))
       .catch(err => apiErr(reply, err))
   })
 
   /** search */
 
-  fastify.get(`/${resource}`, ctl.getSchema, async (request: AppRequest, reply) => {
+  fastify.get(`/${resource}`, vld.getSchema, async (request: AppRequest, reply) => {
     const { query, meta } = request
 
     return ctl.search(query)
@@ -60,4 +63,4 @@ const route = async (fastify: FastifyInstance) => {
 }
 
 
-export default route
+export default routes

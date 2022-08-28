@@ -1,8 +1,7 @@
 import { FastifyRedis } from '@fastify/redis'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 
-import { ControllerClasses } from './controllers.decl'
-import { SearchQuery, AppDoc } from './models.decl'
+import { SearchQuery } from './models.decl'
 
 // -- app/system base
 
@@ -13,7 +12,7 @@ declare module 'fastify' {
 
     config: AppConfig
     redis: FastifyRedis
-    api: { [version: string]: ModuleStructure }
+    modules: { [version: string]: string[] }
   }
 
   interface FastifyRequest {
@@ -32,9 +31,23 @@ export interface AppConfig {
   cache: boolean
 }
 
-export interface ModuleStructure {
-  modules: string[],
-  controllers: { [key: string]: ControllerClasses },
+// -- model base
+
+export interface IBaseModel<T> {
+  _init (fastify: FastifyInstance) : void
+  _genKey (_id: string) : string
+
+  _create (data: T, options?: ICreateOption) : T
+  _read (_id: string | object) : T
+  _update (query: object, data: T, hard?: boolean) : T
+  _search (query: object, otions?: ISearchParams, hasNear?: boolean) : ISearchResult
+  _delete (_id: string): boolean
+
+  _deleteMany (query: object): boolean
+}
+
+export interface ICreateOption {
+  cache: boolean
 }
 
 // -- request specifics
@@ -42,7 +55,7 @@ export interface ModuleStructure {
 export type AppRequest = FastifyRequest<{
   Params: { _id: string }
   Querystring: SearchQuery
-  Body: AppDoc
+  Body: unknown
   Meta: IMeta
 }>
 
@@ -57,48 +70,6 @@ export interface IMeta {
     foo?: string
     bar?: string
   }
-}
-
-export interface IValidationSchema {
-  body: {
-    type?: string
-    required?: string[]
-    properties?: object
-  }
-  querystring: object
-}
-
-// -- controller base
-
-export declare class BaseController {
-  public getSchema: {}
-  public postSchema: {}
-  public patchSchema: {}
-
-  create (data: AppDoc, meta: IMeta): Promise<AppDoc>
-  read (_id: string, meta: IMeta): Promise<AppDoc>
-  update (_id: string, data: AppDoc, meta: IMeta): Promise<AppDoc>
-  delete (_id: string, meta: IMeta): Promise<boolean>
-  search (options: SearchQuery): Promise<ISearchResult>
-}
-
-// -- model base
-
-export interface IBaseModel<T> {
-  _init (fastify: FastifyInstance) : void
-  _genKey (_id: string) : string
-
-  _create (data: T, options?: IBaseModelCreateOption) : T
-  _read (_id: string | object) : T
-  _update (query: object, data: T, hard?: boolean) : T
-  _search (query: object, otions?: ISearchParams, hasNear?: boolean) : ISearchResult
-  _delete (_id: string): boolean
-
-  _deleteMany (query: object): boolean
-}
-
-export interface IBaseModelCreateOption {
-  cache: boolean
 }
 
 // -- search base
